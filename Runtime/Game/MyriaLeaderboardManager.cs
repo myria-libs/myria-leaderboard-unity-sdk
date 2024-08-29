@@ -63,6 +63,22 @@ namespace MyriaLeaderboard
             return initialized;
         }
 
+        public static bool CheckInitialized()
+        {
+            if (!initialized)
+            {
+                MyriaLeaderboardConfig.current.token = "";
+                // MyriaLeaderboardConfig.current.refreshToken = "";
+                // MyriaLeaderboardConfig.current.deviceID = "";
+                if (!Init())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         [InitializeOnEnterPlayMode]
         static void OnEnterPlaymodeInEditor(EnterPlayModeOptions options)
         {
@@ -78,7 +94,7 @@ namespace MyriaLeaderboard
         /// <param name="onComplete">onComplete Action for handling the response of type MyriaLeaderboardGetScoreListResponse</param>
         public static void GetScoreList(string leaderboardId, int page, int limit, Action<GetScoreListResponse> onComplete, ESortingField? sortingField, EOrderBy? orderBy)
         {
-            if (!initialized)
+            if (!CheckInitialized())
             {
                 Debug.Log("LeaderboardSDK-is-not-initialized");
                 onComplete?.Invoke(MyriaLeaderboardResponseFactory.SDKNotInitializedError<GetScoreListResponse>());
@@ -106,7 +122,7 @@ namespace MyriaLeaderboard
         /// <param name="onComplete">onComplete Action for handling the response of type MyriaLeaderboardGetScoreListResponse</param>
         public static void PostScore(string leaderboardId, PostScoreParams data, Action<PostScoreResponse> onComplete)
         {
-            if (!initialized)
+            if (!CheckInitialized())
             {
                 onComplete?.Invoke(MyriaLeaderboardResponseFactory.SDKNotInitializedError<PostScoreResponse>());
                 return;
