@@ -1,5 +1,5 @@
 {
-    "name": "com.myria.leaderboard.sdk",
+    "name": "com.myria-libs.myrialeaderboardsdk",
     "version": "3.0.0",
     "displayName": "MyriaLeaderboard",
     "description": "Myria Leaderboard is a game backend-as-a-service which allow developers to manage and create leaderboard data flow in game.\n",
