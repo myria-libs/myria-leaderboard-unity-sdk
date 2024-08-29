@@ -1,7 +1,6 @@
 {
     "name": "myria-libs.myrialeaderboardsdk.runtime",
     "references": [
-        "GUID:bc3f6fd54d1949418bee322259516545"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
