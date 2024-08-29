@@ -34,6 +34,7 @@ namespace MyriaLeaderboard
 
         public (string key, string value) dateVersion = ("LL-Version", "2024-08-27");
         public string xDeveloperApiKey;
+        public string publicKey;
         public MyriaEnvironment env;
         //[HideInInspector]
 //         public string token;
@@ -156,10 +157,11 @@ namespace MyriaLeaderboard
             return settingsInstance;
         }
 
-        public static bool CreateNewSettings(string xDeveloperApiKey, MyriaEnvironment env, string gameVersion, string domainKey, MyriaLeaderboardConfig.DebugLevel debugLevel = DebugLevel.All, string baseURLParam = null, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string xDeveloperApiKey, string publicKey, MyriaEnvironment env, string gameVersion, string domainKey, MyriaLeaderboardConfig.DebugLevel debugLevel = DebugLevel.All, string baseURLParam = null, bool allowTokenRefresh = false)
         {
             _current = Get();
             _current.xDeveloperApiKey = xDeveloperApiKey;
+            _current.publicKey = publicKey;
             //_current.baseUrl = string.IsNullOrEmpty(baseURLParam) ? _current.baseUrl : baseURLParam;
             _current.env = env;
             // _current.game_version = gameVersion;
@@ -176,6 +178,7 @@ namespace MyriaLeaderboard
         #if MYRIA_LEADERBOARD_COMMANDLINE_SETTINGS
             string[] args = System.Environment.GetCommandLineArgs();
             string _xDeveloperApiKey = null;
+            string _publicKey = null;
             string _baseUrl = null;
             string _domainKey = null;
             for (int i = 0; i < args.Length; i++)
@@ -183,6 +186,9 @@ namespace MyriaLeaderboard
                 if (args[i] == "-xDeveloperApiKey")
                 {
                     _xDeveloperApiKey = args[i + 1];
+                }
+                else (args[i] == "-publicKey") {
+                    _publicKey = args[i+1];
                 }
                 else if (args[i] == "-domainkey")
                 {
@@ -194,10 +200,11 @@ namespace MyriaLeaderboard
                 }
             }
 
-            if (string.IsNullOrEmpty(_xDeveloperApiKey) || string.IsNullOrEmpty(_domainKey) || string.IsNullOrEmpty(_baseURL))
+            if (string.IsNullOrEmpty(_xDeveloperApiKey) || string.IsNullOrEmpty(_publicKey) || string.IsNullOrEmpty(_domainKey) || string.IsNullOrEmpty(_baseURL))
             {
                 return;
             }
+            publicKey = _publicKey;
             xDeveloperApiKey = _xDeveloperApiKey;
             domainKey = _domainKey;
             baseURL = _baseURL;
