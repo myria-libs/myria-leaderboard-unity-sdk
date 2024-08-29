@@ -67,7 +67,7 @@ namespace MyriaLeaderboard
         {
             if (!initialized)
             {
-                MyriaLeaderboardConfig.current.token = "";
+                // MyriaLeaderboardConfig.current.token = "";
                 // MyriaLeaderboardConfig.current.refreshToken = "";
                 // MyriaLeaderboardConfig.current.deviceID = "";
                 if (!Init())
