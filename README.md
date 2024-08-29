@@ -1,5 +1,6 @@
 # leaderboard-unity-sdk
 
+The Leaderboard SDK will provide comprehensive support for the Unity platform, enabling seamless integration and management of all operations related to Leader in your game.
 
 
 ## Getting started
