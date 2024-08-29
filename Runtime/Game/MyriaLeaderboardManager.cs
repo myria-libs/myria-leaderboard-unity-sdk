@@ -25,11 +25,11 @@ namespace MyriaLeaderboard
     {
         #region Init
         static bool initialized;
-        //public static bool Init()
-        //{
-        //    MyriaLeaderboardServerApi.Instantiate();
-        //    return LoadConfig();
-        //}
+        static bool Init()
+        {
+           MyriaLeaderboardServerApi.Instantiate();
+           return LoadConfig();
+        }
         #endregion
 
         /// <summary>
