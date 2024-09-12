@@ -1,13 +1,14 @@
 using System;
 using System.IO;
+using UnityEngine;
+using MyriaLeaderboard.MyriaLeaderboardEnums;
+using MyriaLeaderboard.MyriaLeaderboardExtension;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEditor.PackageManager.UI;
 #endif
-using UnityEngine;
-using MyriaLeaderboard.MyriaLeaderboardEnums;
 
 namespace MyriaLeaderboard.MyriaLeaderboardEnums
 {
@@ -24,36 +25,24 @@ namespace MyriaLeaderboard
         // [HideInInspector] private static readonly string PlayerUrlAppendage = "/player";
         // [HideInInspector] private static readonly string UserUrlAppendage = "/game";
 
-        [HideInInspector] public static string baseUrl = "";
+        public static string baseUrl = "";
 
-        [HideInInspector] public string url = baseUrl + UrlAppendage;
+        [HideInInspector] public string url = string.IsNullOrEmpty(baseUrl) ? (baseUrl + UrlAppendage) : baseUrl;
         // [HideInInspector] public string adminUrl = baseUrl + AdminUrlAppendage;
         // [HideInInspector] public string playerUrl = baseUrl + PlayerUrlAppendage;
         // [HideInInspector] public string userUrl = baseUrl + UserUrlAppendage;
         [HideInInspector] public float clientSideRequestTimeOut = 180f;
+        [HideInInspector] public bool allowCustomUrl;
 
-        public (string key, string value) dateVersion = ("LL-Version", "2024-08-27");
-        public string xDeveloperApiKey;
+        public string developerApiKey;
+        public string publicKey;
         public MyriaEnvironment env;
-        //[HideInInspector]
-//         public string token;
-// #if UNITY_EDITOR
-//         [HideInInspector]
-//         public string adminToken;
-// #endif
-//         [HideInInspector]
-//         public string refreshToken;
-        [HideInInspector]
-        public string domainKey;
-//         [HideInInspector]
-//         public int gameID;
-//         public string game_version = "1.0.0.0";
-//         [HideInInspector] 
-//         public string sdk_version = "";
-//         [HideInInspector]
-//         public string deviceID = "defaultPlayerId";
-        public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
-        public DebugLevel currentDebugLevel = DebugLevel.All;
+        [HideInInspector] public string customUrl;
+        [HideInInspector] public string xApiKey;
+
+        [HideInInspector] public string domainKey;
+        [HideInInspector] public enum DebugLevel { All, ErrorOnly, NormalOnly, Off , AllAsNormal}
+        [HideInInspector] public DebugLevel currentDebugLevel = DebugLevel.All;
 
 
         private static MyriaLeaderboardConfig settingsInstance;
@@ -70,40 +59,46 @@ namespace MyriaLeaderboard
                 {
                     _current = Get();
                 }
-
                 return _current;
             }
         }
 
         private void ConstructUrls()
         {
-            string startOfUrl = "";
-            switch (env)
+            if (allowCustomUrl && !string.IsNullOrEmpty(customUrl))
             {
-                case MyriaEnvironment.Prod:
-                    startOfUrl = "https://prod.myriaverse-leaderboard-api.nonprod-myria.com";
-                    break;
-                case MyriaEnvironment.PreProd:
-                    startOfUrl = "https://preprod.myriaverse-leaderboard-api.nonprod-myria.com";
-                    break;
-                case MyriaEnvironment.Staging:
-                    startOfUrl = "https://staging.myriaverse-leaderboard-api.nonprod-myria.com";
-                    break;
-                case MyriaEnvironment.Dev:
-                    startOfUrl = "https://staging.myriaverse-leaderboard-api.nonprod-myria.com";
-                    break;
-                default:
-                    startOfUrl = "https://staging.myriaverse-leaderboard-api.nonprod-myria.com";
-                    break;
-            }
-            if (!string.IsNullOrEmpty(domainKey))
+                url = customUrl;
+            } else
             {
-                startOfUrl += domainKey + ".";
+                string startOfUrl = "";
+                switch (env)
+                {
+                    case MyriaEnvironment.Prod:
+                        startOfUrl = "https://prod.myriaverse-leaderboard-api.nonprod-myria.com";
+                        break;
+                    case MyriaEnvironment.PreProd:
+                        startOfUrl = "https://preprod.myriaverse-leaderboard-api.nonprod-myria.com";
+                        break;
+                    case MyriaEnvironment.Staging:
+                        startOfUrl = "https://staging.myriaverse-leaderboard-api.nonprod-myria.com";
+                        break;
+                    case MyriaEnvironment.Dev:
+                        startOfUrl = "https://staging.myriaverse-leaderboard-api.nonprod-myria.com";
+                        break;
+                    default:
+                        startOfUrl = "https://staging.myriaverse-leaderboard-api.nonprod-myria.com";
+                        break;
+                }
+                if (!string.IsNullOrEmpty(domainKey))
+                {
+                    startOfUrl += domainKey + ".";
+                }
+                //adminUrl = startOfUrl + AdminUrlAppendage;
+                //playerUrl = startOfUrl + PlayerUrlAppendage;
+                //userUrl = startOfUrl + UserUrlAppendage;
+                url = startOfUrl + UrlAppendage;
             }
-            //adminUrl = startOfUrl + AdminUrlAppendage;
-            //playerUrl = startOfUrl + PlayerUrlAppendage;
-            //userUrl = startOfUrl + UserUrlAppendage;
-            url = startOfUrl;
+            
         }
 
         public static MyriaLeaderboardConfig Get() {
@@ -156,33 +151,35 @@ namespace MyriaLeaderboard
             return settingsInstance;
         }
 
-        public static bool CreateNewSettings(string xDeveloperApiKey, MyriaEnvironment env, string gameVersion, string domainKey, MyriaLeaderboardConfig.DebugLevel debugLevel = DebugLevel.All, string baseURLParam = null, bool allowTokenRefresh = false)
+        public static bool CreateNewSettings(string developerApiKey, string publicKey, MyriaEnvironment env, string gameVersion, string domainKey, MyriaLeaderboardConfig.DebugLevel debugLevel = DebugLevel.All, string baseUrl = null)
         {
             _current = Get();
-            _current.xDeveloperApiKey = xDeveloperApiKey;
-            //_current.baseUrl = string.IsNullOrEmpty(baseURLParam) ? _current.baseUrl : baseURLParam;
+            _current.developerApiKey = developerApiKey;
+            _current.publicKey = publicKey;
+            
+            string newUrl = string.IsNullOrEmpty(baseUrl) ? _current.url : baseUrl;
+            _current.url = newUrl;
             _current.env = env;
-            // _current.game_version = gameVersion;
-            // _current.currentDebugLevel = debugLevel;
+            _current.xApiKey = EncryptExtentsions.EncryptApiKey(developerApiKey, publicKey);
+             //_current.game_version = gameVersion;
+             //_current.currentDebugLevel = debugLevel;
             // _current.allowTokenRefresh = allowTokenRefresh;
             _current.domainKey = domainKey;
-            _current.ConstructUrls();
-            Debug.Log("_current" + _current.env + _current.xDeveloperApiKey);
             return true;
         }
 
         private void CheckForSettingOverrides()
         {
-        #if MYRIA_LEADERBOARD_COMMANDLINE_SETTINGS
+#if MYRIA_LEADERBOARD_COMMANDLINE_SETTINGS
             string[] args = System.Environment.GetCommandLineArgs();
-            string _xDeveloperApiKey = null;
+            string _developerApiKey = null;
             string _baseUrl = null;
             string _domainKey = null;
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i] == "-xDeveloperApiKey")
+                if (args[i] == "-developerApiKey")
                 {
-                    _xDeveloperApiKey = args[i + 1];
+                    _developerApiKey = args[i + 1];
                 }
                 else if (args[i] == "-domainkey")
                 {
@@ -194,14 +191,14 @@ namespace MyriaLeaderboard
                 }
             }
 
-            if (string.IsNullOrEmpty(_xDeveloperApiKey) || string.IsNullOrEmpty(_domainKey) || string.IsNullOrEmpty(_baseURL))
+            if (string.IsNullOrEmpty(_developerApiKey) || string.IsNullOrEmpty(_domainKey) || string.IsNullOrEmpty(_baseURL))
             {
                 return;
             }
-            xDeveloperApiKey = _xDeveloperApiKey;
+            developerApiKey = _developerApiKey;
             domainKey = _domainKey;
             baseURL = _baseURL;
-        #endif
+#endif
         }
     }
 }

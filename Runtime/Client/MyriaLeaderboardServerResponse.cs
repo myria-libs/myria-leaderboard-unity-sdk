@@ -98,6 +98,7 @@ namespace MyriaLeaderboard
         public int id { get; set; }
         public string userId { get; set; }
         public int leaderboardId { get; set; }
+        public int period { get; set; }
         public int score { get; set; }
         public string createdAt { get; set; }
         public string updatedAt { get; set; }
@@ -106,13 +107,11 @@ namespace MyriaLeaderboard
 
     public class GetScoreDataResponse
     {
-        // we are doing thisfor legacy reasons, since it is no longer being set on the backend
         public PaginationMetaResponse meta { get; set; }
         public GetListScoreItemResponse[] items { get; set; }
     }
     public class GetScoreListResponse : MyriaLeaderboardResponse
     {
-        // we are doing thisfor legacy reasons, since it is no longer being set on the backend
         public string status { get; set; }
         public GetScoreDataResponse data { get; set; }
     }
@@ -128,13 +127,18 @@ namespace MyriaLeaderboard
         public int period { get; set; }
         public string createdAt { get; set; }
         public string updatedAt { get; set; }
-        public User user { get; set; }
+    }
+
+    public class PostScoreResponseData
+    {
+        public PostScoreDataResponse[] success { get; set; }
+        public PostScoreDataResponse[] failed { get; set; }
     }
 
     public class PostScoreResponse : MyriaLeaderboardResponse
     {
         public string status { get; set; }
-        public PostScoreDataResponse[] data { get; set; }
+        public PostScoreResponseData data { get; set; }
     }
 
 

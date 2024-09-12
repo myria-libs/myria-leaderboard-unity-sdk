@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using MyriaLeaderboard.MyriaLeaderboardEnums;
+using MyriaLeaderboard.MyriaLeaderboardExtension;
+
 #if MYRIA_LEADERBOARD_USE_NEWTONSOFTJSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -288,8 +290,12 @@ namespace MyriaLeaderboard
 
 
             if (MyriaLeaderboardConfig.current != null)
-                headers.Add("x-api-developer-key", MyriaLeaderboardConfig.current.xDeveloperApiKey);
-                headers.Add(MyriaLeaderboardConfig.current.dateVersion.key, MyriaLeaderboardConfig.current.dateVersion.value);
+            {
+                string encryptApiKey = EncryptExtentsions.EncryptApiKey(MyriaLeaderboardConfig.current.developerApiKey, MyriaLeaderboardConfig.current.publicKey);
+                headers.Add("encrypted-api-key", encryptApiKey);
+                //headers.Add("game-id", MyriaLeaderboardConfig.current.gameId);
+                //headers.Add(MyriaLeaderboardConfig.current.dateVersion.key, MyriaLeaderboardConfig.current.dateVersion.value);
+            }
 
             if (additionalHeaders != null)
             {

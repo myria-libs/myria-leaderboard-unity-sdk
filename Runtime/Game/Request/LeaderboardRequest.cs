@@ -22,21 +22,27 @@ namespace MyriaLeaderboard {
         public string sortingField { get; set; }
         public string orderBy { get; set; }
     }
+    public class PayloadEncryptData
+    {
+        public string data { get; set; }
+    }
 }
 
 namespace MyriaLeaderboard.Requests
 {
-
-    public class Leaderboard
-    {
-        public int leaderboard_id { get; set; }
-    }
     public class GetScoreListRequest : BaseGetRequests
     {
         public string leaderboardKey { get; set; }
         public static int? nextCursor { get; set; }
         public static int? prevCursor { get; set; }
     }
+    public class GetUserScoreRequestAPI
+    {
+        public string leaderboardKey { get; set; }
+        public int? period { get; set; }
+        public string userId { get; set; }
+    }
+
     public class PostScoreRequest : BaseGetRequests
     {
         public string leaderboardKey { get; set; }
